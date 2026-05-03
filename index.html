@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keyboard Marketplace</title>
+    <style>
+         /* Page base styling */
+        body {
+            background-color: #f7f4ef;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            color: #3f3f3f;
+        }
+        /* Header section */
+        .header {
+            background-color: #e8e1d6;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid #d6cdc0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            color: #6e6e6e;
+        }
+
+        /* 
+
+        Filter buttons section 
+
+        */ 
+
+        .filter-bar {
+            max-width: 950px;
+            margin: 20px auto 10px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            text-decoration: none;
+            background: white;
+            color: #5f5a54;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid #e2d8ca;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.18s ease-out;
+        }
+
+        .filter-btn:hover {
+            background-color: #f4efe8;
+        }
+
+        .filter-btn.active {
+            background-color: #d8d0c2;
+            color: #3f3f3f;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Listihngs card */
+        .card {
+            background: white;
+            margin-bottom: 18px;
+            border-radius: 14px;
+            border: 1px solid #ece6dc;
+            overflow: hidden;
+            transition: all 0.18s ease-out;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.08);
+            background-color: #faf7f2;
+        }
+
+        .card-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .card-left h3 {
+            margin: 0 0 14px 0;
+            font-size: 18px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .status {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .sold {
+            color: #b55;
+        }
+
+        .available {
+            color: #6c8f6c;
+        }
+
+        .date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .card-right {
+            text-align: right;
+            min-width: 170px;
+            margin-left: 20px;
+        }
+
+        /*. Values badging */
+        .badge {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .badge.great {
+            background-color: #dcebd8;
+            color: #446344;
+        }
+
+        .badge.fair {
+            background-color: #efe7d9;
+            color: #76634a;
+        }
+
+        .badge.premium {
+            background-color: #f0d9d5;
+            color: #8a4f49;
+        }
+
+        .estimate {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .card-details {
+            display: none;
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid #f0ebe3;
+            background-color: #fcfaf7;
+        }
+
+        .detail-row {
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Keyboard Marketplace</h1>
+        <p>Live listings and pricing insights</p>
+    </div>
+
+    <div class="filter-bar">
+        <a href="/?filter=all" class="filter-btn {% if selected_filter == 'all' %}active{% endif %}">
+            All Listings
+        </a>
+        <a href="/?filter=keyboards" class="filter-btn {% if selected_filter == 'keyboards' %}active{% endif %}">
+            Keyboards
+        </a>
+        <a href="/?filter=accessories" class="filter-btn {% if selected_filter == 'accessories' %}active{% endif %}">
+            Accessories
+        </a>
+    </div>
+
+    <div class="container">
+        {% if listings %}
+            {% for item in listings %}
+            <div class="card">
+                  <!-- click for expandable summary -->
+                <div class="card-summary" onclick="toggleDetails('details-{{ loop.index }}')">
+                    <div class="card-left">
+                        <h3>{{ item.item_name }}</h3>
+
+                        <div class="price">
+                            ${{ "%.2f"|format(item.price) }}
+                        </div>
+                        
+                         <!-- sold / available -->
+                        <div class="status">
+                            {% if item.is_sold %}
+                                <span class="sold">Sold</span>
+                            {% else %}
+                                <span class="available">Available</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="date">
+                            {{ item.created_utc }}
+                        </div>
+                    </div>
+                
+                     <!-- right tabs (ML output) -->
+                    <div class="card-right">
+                        {% if item.value_label == "Accessory" %}
+                            <div class="badge fair">
+                                Accessory
+                            </div>
+                        {% else %}
+                            <div class="badge {{ item.value_class }}">
+                                {{ item.value_label }}
+                            </div>
+                            <div class="estimate">
+                                Est. ${{ "%.2f"|format(item.estimated_price) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-details" id="details-{{ loop.index }}">
+                    <div class="detail-row">
+                        <span class="detail-label">Source line:</span>
+                        {{ item.source_line }}
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Estimated price:</span>
+                        ${{ "%.2f"|format(item.estimated_price) }}
+                    </div>
+
+                    {% if item.difference < 0 %}
+                        <div class="detail-row" style="color:#4a7c59;">
+                            Under market by ${{ "%.2f"|format(item.difference | abs) }}
+                        </div>
+                    {% elif item.difference > 0 %}
+                        <div class="detail-row" style="color:#a05a5a;">
+                           Over market by ${{ "%.2f"|format(item.difference) }}
+                        </div>
+                    {% else %}
+                        <div class="detail-row">
+                            Fairly priced
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card empty">
+                <h3>No listings found</h3>
+                <p>Try a different filter  or get nore data!!!!.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    # added fucnitonality for mroe info on a lisitng to pop up tav
+    <script>
+        function toggleDetails(id) {
+            const section = document.getElementById(id);
+            if (section.style.display === "block") {
+                section.style.display = "none";
+            } else {
+                section.style.display = "block";
+            }
+        }
+    </script>
+
+</body>
+</html>
