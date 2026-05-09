@@ -5,9 +5,6 @@ It uses a preprocessing pipeline to handle both categorical and numeric features
 in collaboration with Bret Harvestine, an old coworker from Delta Defense. He had some pointers on ML and how to create a more robust system, so I took
 him up on his help. 
 
-Some of the techniques did come from him, but the work is my own and worked with me. He did not do anything for me. 
-
-
 """
 
 import os
